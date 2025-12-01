@@ -27,19 +27,20 @@ export default function Home() {
   const [manAnim, setManAnim] = useState("");
   const [bridgeStatus, setBridgeStatus] = useState(Array(15).fill("intact")); // "intact" or "collapsed"
 
-  const stopsRef = useRef([]);
+  // ✅ Typed ref correctly for TypeScript
+  const stopsRef = useRef<(HTMLDivElement | null)[]>([]);
   const [manPos, setManPos] = useState(0);
 
   // Update man's position along the bridges
   useEffect(() => {
     if (!won && stopsRef.current[0]) {
-      const firstBridge = stopsRef.current[0].offsetLeft;
-      const bridgeWidth = stopsRef.current[0].offsetWidth + 12; // spacing
+      const firstBridge = stopsRef.current[0]?.offsetLeft || 0;
+      const bridgeWidth = (stopsRef.current[0]?.offsetWidth || 0) + 12; // spacing
       setManPos(firstBridge + index * bridgeWidth);
     }
   }, [index, won]);
 
-  function handleAnswer(option) {
+  function handleAnswer(option: string) {
     if (option !== questions[index].answer) {
       // Collapse the current bridge
       setBridgeStatus((prev) => {
@@ -115,11 +116,17 @@ export default function Home() {
       {/* Bridges + Man */}
       <div className="mt-10 w-full max-w-4xl relative flex justify-center z-10 h-40 items-end gap-3">
         {Array.from({ length: 15 }).map((_, i) => (
-          <div key={i} ref={(el) => (stopsRef.current[i] = el)} className="relative">
+          <div
+            key={i}
+            ref={(el) => (stopsRef.current[i] = el)}
+            className="relative"
+          >
             <img
               src="/bridge.svg"
               alt="Bridge"
-              className={`w-[80px] h-[40px] object-contain transition-all duration-700 ${bridgeStatus[i] === "collapsed" ? "animate-collapse opacity-0" : ""}`}
+              className={`w-[80px] h-[40px] object-contain transition-all duration-700 ${
+                bridgeStatus[i] === "collapsed" ? "animate-collapse opacity-0" : ""
+              }`}
             />
             {bridgeStatus[i] === "collapsed" && (
               <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-16 h-8 bg-gradient-to-t from-red-700 via-orange-500 to-transparent rounded-full animate-fire"></div>
@@ -129,7 +136,9 @@ export default function Home() {
 
         {/* Man */}
         <div
-          className={`absolute bottom-[50px] text-4xl transition-all duration-300 ${manAnim} ${won ? "victory" : ""}`}
+          className={`absolute bottom-[50px] text-4xl transition-all duration-300 ${manAnim} ${
+            won ? "victory" : ""
+          }`}
           style={{
             left: won ? "50%" : manPos,
             transform: won ? "translateX(-50%) scale(2)" : undefined,
