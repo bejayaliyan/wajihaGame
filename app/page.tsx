@@ -27,15 +27,14 @@ export default function Home() {
   const [manAnim, setManAnim] = useState("");
   const [bridgeStatus, setBridgeStatus] = useState(Array(15).fill("intact")); // "intact" or "collapsed"
 
-  // ✅ Typed ref correctly for TypeScript
   const stopsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const [manPos, setManPos] = useState(0);
+  const [manPos, setManPos] = useState<number>(0);
 
-  // Update man's position along the bridges
+  // ✅ Update man's position along the bridges (TypeScript-safe)
   useEffect(() => {
     if (!won && stopsRef.current[0]) {
-      const firstBridge = stopsRef.current[0]?.offsetLeft || 0;
-      const bridgeWidth = (stopsRef.current[0]?.offsetWidth || 0) + 12; // spacing
+      const firstBridge: number = stopsRef.current[0]?.offsetLeft ?? 0;
+      const bridgeWidth: number = (stopsRef.current[0]?.offsetWidth ?? 0) + 12; // spacing
       setManPos(firstBridge + index * bridgeWidth);
     }
   }, [index, won]);
@@ -118,7 +117,7 @@ export default function Home() {
         {Array.from({ length: 15 }).map((_, i) => (
           <div
             key={i}
-            ref={(el) => (stopsRef.current[i] = el)}
+            ref={(el) => { stopsRef.current[i] = el; }} // ✅ TypeScript-safe
             className="relative"
           >
             <img
